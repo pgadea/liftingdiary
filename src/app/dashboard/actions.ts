@@ -4,12 +4,15 @@ import { auth } from "@clerk/nextjs/server";
 import { db, schema } from "@/db";
 import { eq, and, gte, lt } from "drizzle-orm";
 
-export async function getWorkoutsByDate(date: Date) {
+export async function getWorkoutsByDate(dateString: string) {
   const { userId } = await auth();
 
   if (!userId) {
     throw new Error("Unauthorized");
   }
+
+  // Parse the date string (YYYY-MM-DD format)
+  const date = new Date(dateString);
 
   // Create date range for the selected day (00:00:00 to 23:59:59)
   const startOfDay = new Date(date);
@@ -57,12 +60,15 @@ export interface WorkoutWithDetails {
   }[];
 }
 
-export async function getWorkoutsWithDetails(date: Date): Promise<WorkoutWithDetails[]> {
+export async function getWorkoutsWithDetails(dateString: string): Promise<WorkoutWithDetails[]> {
   const { userId } = await auth();
 
   if (!userId) {
     throw new Error("Unauthorized");
   }
+
+  // Parse the date string (YYYY-MM-DD format)
+  const date = new Date(dateString);
 
   // Create date range for the selected day
   const startOfDay = new Date(date);

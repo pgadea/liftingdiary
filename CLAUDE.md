@@ -2,6 +2,20 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## CRITICAL: Documentation-First Development
+
+**ALWAYS refer to relevant documentation files in the `/docs` directory before generating any code.**
+
+When implementing features or making changes:
+1. **First**, check if there's a relevant documentation file in `/docs`
+2. **Read** the documentation thoroughly to understand patterns, conventions, and requirements
+3. **Then** generate code that follows the documented guidelines
+
+Available documentation files:
+- `/docs/ui.md` - UI component patterns and styling conventions
+
+This ensures consistency across the codebase and adherence to project-specific patterns.
+
 ## Project Overview
 
 Next.js 15 application for a lifting diary course, bootstrapped with `create-next-app`. Uses TypeScript, Tailwind CSS v4, and Turbopack for fast development.

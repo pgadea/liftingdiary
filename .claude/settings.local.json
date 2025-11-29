@@ -7,7 +7,8 @@
       "mcp__neon__describe_table_schema",
       "mcp__neon__run_sql_transaction",
       "mcp__neon__prepare_database_migration",
-      "Bash(mkdir:*)"
+      "Bash(mkdir:*)",
+      "Bash(npx shadcn@latest add:*)"
     ],
     "deny": [],
     "ask": []

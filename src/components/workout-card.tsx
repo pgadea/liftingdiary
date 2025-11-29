@@ -1,5 +1,8 @@
+import { format } from "date-fns";
 import { WorkoutWithDetails } from "@/app/dashboard/actions";
 import { Dumbbell, Clock } from "lucide-react";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 
 interface WorkoutCardProps {
   workout: WorkoutWithDetails;
@@ -7,11 +10,7 @@ interface WorkoutCardProps {
 
 export function WorkoutCard({ workout }: WorkoutCardProps) {
   const formatTime = (date: Date) => {
-    return new Date(date).toLocaleTimeString('en-US', {
-      hour: 'numeric',
-      minute: '2-digit',
-      hour12: true,
-    });
+    return format(new Date(date), "h:mm a");
   };
 
   const calculateDuration = () => {
@@ -32,63 +31,67 @@ export function WorkoutCard({ workout }: WorkoutCardProps) {
   };
 
   return (
-    <div className="border rounded-lg p-6 bg-white shadow-sm hover:shadow-md transition-shadow">
-      <div className="flex justify-between items-start mb-4">
-        <div>
-          <h3 className="text-xl font-semibold flex items-center gap-2">
-            <Dumbbell className="w-5 h-5" />
-            {workout.name}
-          </h3>
-          <div className="flex items-center gap-4 mt-2 text-sm text-gray-600">
-            <span className="flex items-center gap-1">
-              <Clock className="w-4 h-4" />
-              {formatTime(workout.startedAt)}
-            </span>
-            {workout.completedAt && (
-              <span className="px-2 py-1 bg-green-100 text-green-700 rounded">
-                Completed
+    <Card>
+      <CardHeader>
+        <div className="flex justify-between items-start">
+          <div>
+            <CardTitle className="flex items-center gap-2">
+              <Dumbbell className="w-5 h-5" />
+              {workout.name}
+            </CardTitle>
+            <div className="flex items-center gap-4 mt-2 text-sm text-muted-foreground">
+              <span className="flex items-center gap-1">
+                <Clock className="w-4 h-4" />
+                {formatTime(workout.startedAt)}
               </span>
-            )}
-            {!workout.completedAt && (
-              <span className="px-2 py-1 bg-yellow-100 text-yellow-700 rounded">
-                In Progress
-              </span>
-            )}
+              {workout.completedAt && (
+                <Badge variant="default" className="bg-green-600 hover:bg-green-700">
+                  Completed
+                </Badge>
+              )}
+              {!workout.completedAt && (
+                <Badge variant="secondary">
+                  In Progress
+                </Badge>
+              )}
+            </div>
+          </div>
+          <div className="text-right">
+            <div className="text-sm text-muted-foreground">Duration</div>
+            <div className="text-lg font-semibold">{calculateDuration()}</div>
           </div>
         </div>
-        <div className="text-right">
-          <div className="text-sm text-gray-500">Duration</div>
-          <div className="text-lg font-semibold">{calculateDuration()}</div>
-        </div>
-      </div>
+      </CardHeader>
 
-      {workout.exercises.length > 0 && (
-        <div className="space-y-4">
-          {workout.exercises.map((exercise) => (
-            <div key={exercise.id} className="border-t pt-4">
-              <h4 className="font-medium mb-2">{exercise.name}</h4>
-              <div className="grid grid-cols-3 gap-2 text-sm">
-                <div className="font-semibold text-gray-600">Set</div>
-                <div className="font-semibold text-gray-600">Reps</div>
-                <div className="font-semibold text-gray-600">Weight (lbs)</div>
-                {exercise.sets.map((set) => (
-                  <div key={set.id} className="contents">
-                    <div>{set.setNumber}</div>
-                    <div>{set.reps}</div>
-                    <div>{set.weight}</div>
-                  </div>
-                ))}
+      <CardContent>
+        {workout.exercises.length > 0 && (
+          <div className="space-y-4">
+            {workout.exercises.map((exercise) => (
+              <div key={exercise.id} className="border-t pt-4 first:border-t-0 first:pt-0">
+                <h4 className="font-medium mb-2">{exercise.name}</h4>
+                <div className="grid grid-cols-3 gap-2 text-sm">
+                  <div className="font-semibold text-muted-foreground">Set</div>
+                  <div className="font-semibold text-muted-foreground">Reps</div>
+                  <div className="font-semibold text-muted-foreground">Weight (lbs)</div>
+                  {exercise.sets.map((set) => (
+                    <div key={set.id} className="contents">
+                      <div>{set.setNumber}</div>
+                      <div>{set.reps}</div>
+                      <div>{set.weight}</div>
+                    </div>
+                  ))}
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
-      )}
+            ))}
+          </div>
+        )}
 
-      {workout.exercises.length === 0 && (
-        <div className="text-center text-gray-500 py-4">
-          No exercises logged yet
-        </div>
-      )}
-    </div>
+        {workout.exercises.length === 0 && (
+          <div className="text-center text-muted-foreground py-4">
+            No exercises logged yet
+          </div>
+        )}
+      </CardContent>
+    </Card>
   );
 }

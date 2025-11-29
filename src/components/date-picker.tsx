@@ -1,6 +1,15 @@
 "use client";
 
-import { Calendar } from "lucide-react";
+import { format } from "date-fns";
+import { Calendar as CalendarIcon } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
+import { Label } from "@/components/ui/label";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 
 interface DatePickerProps {
   selectedDate: Date;
@@ -8,43 +17,29 @@ interface DatePickerProps {
 }
 
 export function DatePicker({ selectedDate, onDateChange }: DatePickerProps) {
-  const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newDate = new Date(e.target.value);
-    onDateChange(newDate);
-  };
-
-  const formatDateForInput = (date: Date) => {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
-  };
-
-  const formatDateDisplay = (date: Date) => {
-    return date.toLocaleDateString('en-US', {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    });
-  };
-
   return (
     <div className="flex flex-col gap-2">
-      <label htmlFor="date-picker" className="text-sm font-medium">
-        Workout Date
-      </label>
-      <div className="relative">
-        <input
-          id="date-picker"
-          type="date"
-          value={formatDateForInput(selectedDate)}
-          onChange={handleDateChange}
-          className="w-full px-4 py-2 pr-10 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
-        <Calendar className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
-      </div>
-      <p className="text-sm text-gray-600">{formatDateDisplay(selectedDate)}</p>
+      <Label htmlFor="date-picker">Workout Date</Label>
+      <Popover>
+        <PopoverTrigger asChild>
+          <Button
+            id="date-picker"
+            variant="outline"
+            className="w-full justify-start text-left font-normal"
+          >
+            <CalendarIcon className="mr-2 h-4 w-4" />
+            {format(selectedDate, "do MMM yyyy")}
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-auto p-0">
+          <Calendar
+            mode="single"
+            selected={selectedDate}
+            onSelect={(date) => date && onDateChange(date)}
+            initialFocus
+          />
+        </PopoverContent>
+      </Popover>
     </div>
   );
 }
