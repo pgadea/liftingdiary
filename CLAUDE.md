@@ -13,6 +13,7 @@ When implementing features or making changes:
 
 Available documentation files:
 - `/docs/ui.md` - UI component patterns and styling conventions
+- `/docs/data-fetching.md` - **CRITICAL** data fetching patterns and security requirements
 
 This ensures consistency across the codebase and adherence to project-specific patterns.
 

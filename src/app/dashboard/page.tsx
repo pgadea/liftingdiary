@@ -1,44 +1,45 @@
-"use client";
-
-import { useState, useEffect } from "react";
 import { format } from "date-fns";
-import { DatePicker } from "@/components/date-picker";
 import { WorkoutCard } from "@/components/workout-card";
-import { getWorkoutsWithDetails, WorkoutWithDetails } from "./actions";
+import { getWorkoutsWithDetails } from "@/data/workouts";
 import { SignedIn, SignedOut, SignInButton } from "@clerk/nextjs";
-import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { DashboardDatePicker } from "./date-picker-client";
 
-export default function DashboardPage() {
-  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
-  const [workouts, setWorkouts] = useState<WorkoutWithDetails[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+interface DashboardPageProps {
+  searchParams: Promise<{ date?: string }>;
+}
 
-  useEffect(() => {
-    async function loadWorkouts() {
-      setLoading(true);
-      setError(null);
-      try {
-        // Convert Date to YYYY-MM-DD string format for the server action
-        const year = selectedDate.getFullYear();
-        const month = String(selectedDate.getMonth() + 1).padStart(2, "0");
-        const day = String(selectedDate.getDate()).padStart(2, "0");
-        const dateString = `${year}-${month}-${day}`;
+function formatDateToLocalString(date: Date): string {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
 
-        const data = await getWorkoutsWithDetails(dateString);
-        setWorkouts(data);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "Failed to load workouts");
-        console.error("Error loading workouts:", err);
-      } finally {
-        setLoading(false);
-      }
-    }
+function parseDateString(dateString: string): Date {
+  // Parse YYYY-MM-DD as local date, not UTC
+  const [year, month, day] = dateString.split("-").map(Number);
+  return new Date(year, month - 1, day);
+}
 
-    loadWorkouts();
-  }, [selectedDate]);
+export default async function DashboardPage({ searchParams }: DashboardPageProps) {
+  const params = await searchParams;
+
+  // Get date from URL params or default to today
+  const dateString = params.date || formatDateToLocalString(new Date());
+  const selectedDate = parseDateString(dateString);
+
+  // Fetch workouts in Server Component - following documentation pattern
+  let workouts = [];
+  let error = null;
+
+  try {
+    workouts = await getWorkoutsWithDetails(dateString);
+  } catch (err) {
+    error = err instanceof Error ? err.message : "Failed to load workouts";
+    console.error("Error loading workouts:", err);
+  }
 
   return (
     <>
@@ -63,20 +64,8 @@ export default function DashboardPage() {
           <h1 className="text-3xl font-bold mb-6">Workout Dashboard</h1>
 
           <div className="mb-8">
-            <DatePicker
-              selectedDate={selectedDate}
-              onDateChange={setSelectedDate}
-            />
+            <DashboardDatePicker selectedDate={selectedDate} />
           </div>
-
-          {loading && (
-            <Card>
-              <CardContent className="flex items-center justify-center p-12">
-                <Loader2 className="w-8 h-8 animate-spin text-primary" />
-                <span className="ml-2 text-muted-foreground">Loading workouts...</span>
-              </CardContent>
-            </Card>
-          )}
 
           {error && (
             <Card className="border-destructive">
@@ -86,7 +75,7 @@ export default function DashboardPage() {
             </Card>
           )}
 
-          {!loading && !error && workouts.length === 0 && (
+          {!error && workouts.length === 0 && (
             <Card>
               <CardContent className="flex flex-col items-center justify-center p-12 text-center">
                 <p className="text-lg font-medium">No workouts logged for {format(selectedDate, "do MMM yyyy")}</p>
@@ -97,7 +86,7 @@ export default function DashboardPage() {
             </Card>
           )}
 
-          {!loading && !error && workouts.length > 0 && (
+          {!error && workouts.length > 0 && (
             <div className="space-y-4">
               <h2 className="text-lg font-semibold">
                 {workouts.length} {workouts.length === 1 ? "Workout" : "Workouts"} on {format(selectedDate, "do MMM yyyy")}

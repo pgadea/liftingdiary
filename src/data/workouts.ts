@@ -4,47 +4,9 @@ import { auth } from "@clerk/nextjs/server";
 import { db, schema } from "@/db";
 import { eq, and, gte, lt } from "drizzle-orm";
 
-export async function getWorkoutsByDate(dateString: string) {
-  const { userId } = await auth();
-
-  if (!userId) {
-    throw new Error("Unauthorized");
-  }
-
-  // Parse the date string (YYYY-MM-DD format)
-  const date = new Date(dateString);
-
-  // Create date range for the selected day (00:00:00 to 23:59:59)
-  const startOfDay = new Date(date);
-  startOfDay.setHours(0, 0, 0, 0);
-
-  const endOfDay = new Date(date);
-  endOfDay.setHours(23, 59, 59, 999);
-
-  try {
-    const workouts = await db
-      .select()
-      .from(schema.workouts)
-      .where(
-        and(
-          eq(schema.workouts.userId, userId),
-          gte(schema.workouts.date, startOfDay),
-          lt(schema.workouts.date, endOfDay)
-        )
-      )
-      .orderBy(schema.workouts.startedAt);
-
-    return workouts;
-  } catch (error) {
-    console.error("Error fetching workouts:", error);
-    throw new Error("Failed to fetch workouts");
-  }
-}
-
 export interface WorkoutWithDetails {
   id: number;
   name: string;
-  date: Date;
   startedAt: Date;
   completedAt: Date | null;
   exercises: {
@@ -61,32 +23,32 @@ export interface WorkoutWithDetails {
 }
 
 export async function getWorkoutsWithDetails(dateString: string): Promise<WorkoutWithDetails[]> {
+  // 1. Get authenticated user
   const { userId } = await auth();
 
+  // 2. Verify authentication
   if (!userId) {
     throw new Error("Unauthorized");
   }
 
-  // Parse the date string (YYYY-MM-DD format)
-  const date = new Date(dateString);
+  // Parse the date string (YYYY-MM-DD format) as local date
+  const [year, month, day] = dateString.split("-").map(Number);
 
-  // Create date range for the selected day
-  const startOfDay = new Date(date);
-  startOfDay.setHours(0, 0, 0, 0);
-
-  const endOfDay = new Date(date);
-  endOfDay.setHours(23, 59, 59, 999);
+  // Create date range for the selected day in local timezone
+  const startOfDay = new Date(year, month - 1, day, 0, 0, 0, 0);
+  const endOfDay = new Date(year, month - 1, day, 23, 59, 59, 999);
 
   try {
-    // Fetch workouts for the date
+    // 3. Filter by user ID and started_at timestamp - CRITICAL!
+    // Fetch workouts for the date and user
     const workouts = await db
       .select()
       .from(schema.workouts)
       .where(
         and(
           eq(schema.workouts.userId, userId),
-          gte(schema.workouts.date, startOfDay),
-          lt(schema.workouts.date, endOfDay)
+          gte(schema.workouts.startedAt, startOfDay),
+          lt(schema.workouts.startedAt, endOfDay)
         )
       )
       .orderBy(schema.workouts.startedAt);
@@ -136,7 +98,6 @@ export async function getWorkoutsWithDetails(dateString: string): Promise<Workou
         return {
           id: workout.id,
           name: workout.name,
-          date: workout.date,
           startedAt: workout.startedAt,
           completedAt: workout.completedAt,
           exercises,
