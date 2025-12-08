@@ -1,6 +1,6 @@
 import { format } from "date-fns";
 import { WorkoutCard } from "@/components/workout-card";
-import { getWorkoutsWithDetails } from "@/data/workouts";
+import { getWorkoutsWithDetails, WorkoutWithDetails } from "@/data/workouts";
 import { SignedIn, SignedOut, SignInButton } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -31,7 +31,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
   const selectedDate = parseDateString(dateString);
 
   // Fetch workouts in Server Component - following documentation pattern
-  let workouts = [];
+  let workouts: WorkoutWithDetails[] = [];
   let error = null;
 
   try {
