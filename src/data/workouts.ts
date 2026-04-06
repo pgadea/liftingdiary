@@ -4,6 +4,25 @@ import { auth } from "@clerk/nextjs/server";
 import { db, schema } from "@/db";
 import { eq, and, gte, lt } from "drizzle-orm";
 
+export async function createWorkout(data: { name: string; startedAt: Date }) {
+  const { userId } = await auth();
+
+  if (!userId) {
+    throw new Error("Unauthorized");
+  }
+
+  const [workout] = await db
+    .insert(schema.workouts)
+    .values({
+      userId,
+      name: data.name,
+      startedAt: data.startedAt,
+    })
+    .returning();
+
+  return workout;
+}
+
 export interface WorkoutWithDetails {
   id: number;
   name: string;

@@ -14,6 +14,8 @@ When implementing features or making changes:
 Available documentation files:
 - `/docs/ui.md` - UI component patterns and styling conventions
 - `/docs/data-fetching.md` - **CRITICAL** data fetching patterns and security requirements
+- `/docs/data-mutations.md` - **CRITICAL** data mutation patterns with Server Actions and Zod validation
+- `/docs/auth.md` - **CRITICAL** authentication patterns and security with Clerk
 
 This ensures consistency across the codebase and adherence to project-specific patterns.
 
