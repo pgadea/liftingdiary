@@ -8,7 +8,11 @@
       "mcp__neon__run_sql_transaction",
       "mcp__neon__prepare_database_migration",
       "Bash(mkdir:*)",
-      "Bash(npx shadcn@latest add:*)"
+      "Bash(npx shadcn@latest add:*)",
+      "Bash(npm run lint)",
+      "Bash(git add:*)",
+      "Bash(git checkout:*)",
+      "Bash(git merge:*)"
     ],
     "deny": [],
     "ask": []
