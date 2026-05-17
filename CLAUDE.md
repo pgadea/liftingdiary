@@ -11,9 +11,13 @@ When implementing features or making changes:
 2. **Read** the documentation thoroughly to understand patterns, conventions, and requirements
 3. **Then** generate code that follows the documented guidelines
 
+## Code Generation Guidelines section in documentation files will specify the exact patterns and conventions to follow for different layers of the application (UI, data fetching, authentication, etc.).
 Available documentation files:
 - `/docs/ui.md` - UI component patterns and styling conventions
 - `/docs/data-fetching.md` - **CRITICAL** data fetching patterns and security requirements
+- `/docs/data-mutations.md` - **CRITICAL** data mutation patterns with Server Actions and Zod validation
+- `/docs/auth.md` - **CRITICAL** authentication patterns and security with Clerk
+- `/docs/server-components.md` - **CRITICAL** Server Component patterns, including awaiting `params` in Next.js 15
 
 This ensures consistency across the codebase and adherence to project-specific patterns.
 

@@ -4,6 +4,59 @@ import { auth } from "@clerk/nextjs/server";
 import { db, schema } from "@/db";
 import { eq, and, gte, lt } from "drizzle-orm";
 
+export async function createWorkout(data: { name: string; startedAt: Date }) {
+  const { userId } = await auth();
+
+  if (!userId) {
+    throw new Error("Unauthorized");
+  }
+
+  const [workout] = await db
+    .insert(schema.workouts)
+    .values({
+      userId,
+      name: data.name,
+      startedAt: data.startedAt,
+    })
+    .returning();
+
+  return workout;
+}
+
+export async function getWorkout(id: number) {
+  const { userId } = await auth();
+
+  if (!userId) {
+    throw new Error("Unauthorized");
+  }
+
+  const [workout] = await db
+    .select()
+    .from(schema.workouts)
+    .where(and(eq(schema.workouts.id, id), eq(schema.workouts.userId, userId)));
+
+  return workout ?? null;
+}
+
+export async function updateWorkout(
+  id: number,
+  data: { name: string; startedAt: Date }
+) {
+  const { userId } = await auth();
+
+  if (!userId) {
+    throw new Error("Unauthorized");
+  }
+
+  const [workout] = await db
+    .update(schema.workouts)
+    .set({ name: data.name, startedAt: data.startedAt, updatedAt: new Date() })
+    .where(and(eq(schema.workouts.id, id), eq(schema.workouts.userId, userId)))
+    .returning();
+
+  return workout;
+}
+
 export interface WorkoutWithDetails {
   id: number;
   name: string;
