@@ -64,7 +64,7 @@ export default async function DashboardPage({ searchParams }: DashboardPageProps
           <h1 className="text-3xl font-bold mb-6">Workout Dashboard</h1>
 
           <div className="mb-8">
-            <DashboardDatePicker selectedDate={selectedDate} />
+            <DashboardDatePicker dateString={dateString} />
           </div>
 
           {error && (

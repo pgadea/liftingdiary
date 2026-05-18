@@ -4,7 +4,12 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { DatePicker } from "@/components/date-picker";
 
 interface DashboardDatePickerProps {
-  selectedDate: Date;
+  dateString: string;
+}
+
+function parseDateString(dateString: string): Date {
+  const [year, month, day] = dateString.split("-").map(Number);
+  return new Date(year, month - 1, day);
 }
 
 function formatDateToLocalString(date: Date): string {
@@ -14,12 +19,14 @@ function formatDateToLocalString(date: Date): string {
   return `${year}-${month}-${day}`;
 }
 
-export function DashboardDatePicker({ selectedDate }: DashboardDatePickerProps) {
+export function DashboardDatePicker({ dateString }: DashboardDatePickerProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
 
+  // Parse on the client so the date is in the user's local timezone
+  const selectedDate = parseDateString(dateString);
+
   const handleDateChange = (date: Date) => {
-    // Update URL with new date, which will trigger server-side refetch
     const params = new URLSearchParams(searchParams.toString());
     params.set("date", formatDateToLocalString(date));
     router.push(`/dashboard?${params.toString()}`);
