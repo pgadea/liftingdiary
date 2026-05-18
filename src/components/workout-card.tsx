@@ -1,4 +1,5 @@
 import { format } from "date-fns";
+import Link from "next/link";
 import { WorkoutWithDetails } from "@/data/workouts";
 import { Dumbbell, Clock } from "lucide-react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
@@ -31,6 +32,7 @@ export function WorkoutCard({ workout }: WorkoutCardProps) {
   };
 
   return (
+    <Link href={`/dashboard/workout/${workout.id}`} className="block hover:opacity-90 transition-opacity">
     <Card>
       <CardHeader>
         <div className="flex justify-between items-start">
@@ -93,5 +95,6 @@ export function WorkoutCard({ workout }: WorkoutCardProps) {
         )}
       </CardContent>
     </Card>
+    </Link>
   );
 }
